@@ -1,0 +1,29 @@
+/* src/components/Footer.css */
+
+.app-footer {
+  background-color: #282c34;
+  color: white;
+  padding: 10px 0;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: 1000; /* Ensure footer stays on top */
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); /* Adds shadow for some visual depth */
+}
+
+.app-footer a {
+  color: white;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+}
+
+/* To avoid the footer overlapping the content */
+body {
+  padding-bottom: 60px; /* Adjust padding based on footer height */
+}
