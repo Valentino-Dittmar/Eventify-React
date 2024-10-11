@@ -1,4 +1,4 @@
-name: CD for React App
+name: CD React App
 
 # Trigger the workflow on push to main branch
 on:
