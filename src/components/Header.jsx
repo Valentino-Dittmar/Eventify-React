@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
-    setIsLoggedIn(!!authToken); // Set to true if token exists
+    setIsLoggedIn(!!authToken); // Setting to true if the token is there
   }, []);
 
+  // Define paths where the header should not be displayed
+  const noHeaderPaths = ["/login", "/register", "/oauth2/callback", '/'];
+
+  // If the current path is in noHeaderPaths, don't render the header
+  if (noHeaderPaths.includes(location.pathname)) {
+    return null;
+  }
+
+  // If user is not logged in, don't render the header
   if (!isLoggedIn) {
     return null;
   }
@@ -17,7 +27,6 @@ const Header = () => {
   return (
     <header className="bg-indigo-600 shadow-md">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
-        {/* Brand Name */}
         <h1
           className="text-4xl font-extrabold text-white tracking-wide cursor-pointer"
           onClick={() => navigate("/home")}
