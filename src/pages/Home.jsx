@@ -6,31 +6,22 @@ const HomePage = () => {
 
   useEffect(() => {
     // Fetch user information from the backend
-    const fetchUserInfo = async () => {
+    const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-          console.error('No authentication token found');
-          return;
-        }
-
-        const response = await axios.get('http://localhost:8080/', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.get("http://localhost:8080/auth/me", {
+          withCredentials: true, // Ensure cookies are included
         });
-
-        // The response data is a map of user attributes
-        const userAttributes = response.data;
-        const name = userAttributes.name || userAttributes.displayName || userAttributes.given_name;
-
-        setUserName(name || 'User');
+    
+        setUser(response.data); // Update the global user state
       } catch (error) {
-        console.error('Error fetching user information:', error);
+        console.error("Error fetching user:", error);
+        setUser(null); // Reset user state if an error occurs
+      } finally {
+        setLoading(false); // Ensure loading is set to false
       }
     };
 
-    fetchUserInfo();
+    fetchUser();
   }, []);
 
   return (

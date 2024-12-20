@@ -7,6 +7,7 @@ import * as Yup from "yup";
 const LoginForm = () => {
   const navigate = useNavigate();
 
+  // Validation schema
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Required"),
     password: Yup.string()
@@ -18,6 +19,7 @@ const LoginForm = () => {
       .required("Required"),
   });
 
+  // Handle form submission
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       const response = await axios.post(
@@ -33,10 +35,15 @@ const LoginForm = () => {
           withCredentials: true,
         }
       );
-      localStorage.setItem("authToken", response.data);
-      console.log("Login successful, token stored:", response.data);
 
-      navigate("/home");
+      const token = response.data; // Assuming the backend returns a token in `response.data.token`
+      if (token) {
+        localStorage.setItem("authToken", token);
+        console.log("Login successful, token stored:", token);
+        navigate("/home"); // Redirect to the home page
+      } else {
+        throw new Error("Invalid response from server.");
+      }
     } catch (error) {
       console.error("Error during login:", error);
       alert("Login failed. Please check your credentials and try again.");
@@ -45,10 +52,12 @@ const LoginForm = () => {
     }
   };
 
+  // Handle Google login
   const handleGoogleLogin = () => {
     window.location.href = "http://localhost:8080/oauth2/authorization/google";
   };
 
+  // Handle registration navigation
   const handleRegister = () => {
     navigate("/register");
   };
@@ -59,7 +68,6 @@ const LoginForm = () => {
       style={{
         backgroundImage:
           "url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80')",
-        overflow: "hidden",
       }}
     >
       <div className="bg-white bg-opacity-90 rounded-lg shadow-xl p-8 max-w-md w-full">
@@ -67,6 +75,7 @@ const LoginForm = () => {
           Login
         </h1>
 
+        {/* Formik Form */}
         <Formik
           initialValues={{ email: "", password: "" }}
           validationSchema={validationSchema}
@@ -74,6 +83,7 @@ const LoginForm = () => {
         >
           {({ isSubmitting }) => (
             <Form>
+              {/* Email Field */}
               <div className="mb-4">
                 <label
                   htmlFor="email"
@@ -95,6 +105,7 @@ const LoginForm = () => {
                 />
               </div>
 
+              {/* Password Field */}
               <div className="mb-6">
                 <label
                   htmlFor="password"
@@ -116,6 +127,7 @@ const LoginForm = () => {
                 />
               </div>
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -127,12 +139,14 @@ const LoginForm = () => {
           )}
         </Formik>
 
+        {/* OR Divider */}
         <div className="my-6 flex items-center">
           <hr className="flex-grow border-t border-gray-300" />
           <span className="mx-4 text-gray-500">OR</span>
           <hr className="flex-grow border-t border-gray-300" />
         </div>
 
+        {/* Google Login Button */}
         <button
           type="button"
           onClick={handleGoogleLogin}
@@ -143,21 +157,26 @@ const LoginForm = () => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 48 48"
           >
-            {/* SVG paths for Google icon */}
+            <path
+              fill="#EA4335"
+              d="M24 9.5c3.24 0 6.15 1.2 8.44 3.16l6.32-6.32C34.69 2.59 29.68 0 24 0 14.7 0 7.01 5.66 3.27 13.75l7.49 5.82C12.56 11.27 17.8 9.5 24 9.5z"
+            />
+    
           </svg>
           Continue with Google
         </button>
 
+        {/* Register  */}
         <div className="mt-6 text-center">
           <p className="text-gray-700 text-base">
             Don't have an account?{" "}
-            <a
-              href="#"
+            <button
+              type="button"
               onClick={handleRegister}
               className="text-indigo-600 hover:underline"
             >
               Register Here
-            </a>
+            </button>
           </p>
         </div>
       </div>
