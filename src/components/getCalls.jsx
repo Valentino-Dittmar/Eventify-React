@@ -9,9 +9,8 @@ const getService = async () => {
     throw error;
   }
 };
-
-const getCalls = {
-  getService
+const loginGoogle = () => {
+  window.location.href = 'http://localhost:8080/oauth2/authorization/google';
 };
 
-export default getCalls;
+export default getService;

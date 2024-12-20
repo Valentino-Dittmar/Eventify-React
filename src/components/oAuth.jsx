@@ -1,0 +1,37 @@
+import React, { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+const OAuthCallback = () => {
+  const navigate = useNavigate();
+  const location = useLocation(); 
+
+  useEffect(() => {
+    // get the query parameters from the URL
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+
+    if (token) {
+      // Store the token in localStorage
+      localStorage.setItem('authToken', token);
+      console.log('Google login successful, token stored:', token);
+
+      // Clean up URL by removing query parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      // Redirect to the dashboard or home page
+      navigate('/home');
+    } else {
+      console.error('No token found in URL');
+      alert('Authentication failed. Please try logging in.');
+      navigate('/');
+    }
+  }, [location, navigate]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <p className="text-xl text-gray-700">Processing authentication, please wait...</p>
+    </div>
+  );
+};
+
+export default OAuthCallback;
