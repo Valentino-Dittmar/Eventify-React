@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const HomePage = () => {
-  const [userName, setUserName] = useState('');
+  // We track userName and loading states
+  const [userName, setUserName] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch user information from the backend
@@ -11,18 +13,31 @@ const HomePage = () => {
         const response = await axios.get("http://localhost:8080/auth/me", {
           withCredentials: true, // Ensure cookies are included
         });
-    
-        setUser(response.data); // Update the global user state
+
+        // Suppose the backend returns { name: 'John Doe', ... } 
+        // or you have to access it like response.data.username
+        // Adjust as needed:
+        if (response.data && response.data.name) {
+          setUserName(response.data.name);
+        } else {
+          setUserName(""); // or handle no name case
+        }
       } catch (error) {
         console.error("Error fetching user:", error);
-        setUser(null); // Reset user state if an error occurs
+        // On error, just reset userName or do nothing
+        setUserName("");
       } finally {
-        setLoading(false); // Ensure loading is set to false
+        setLoading(false); // We're done loading regardless
       }
     };
 
     fetchUser();
   }, []);
+
+  if (loading) {
+    // Show a simple loader while fetching
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -30,27 +45,29 @@ const HomePage = () => {
       <div
         className="relative bg-cover bg-center h-screen"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1521185496955-15097b20c5fe?auto=format&fit=crop&w=1920&q=80')",
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1521185496955-15097b20c5fe?auto=format&fit=crop&w=1920&q=80')",
         }}
       >
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative container mx-auto px-4 h-full flex items-center justify-center">
           <div className="text-center">
+            {/* If userName is set, show a personalized welcome */}
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-              {userName ? `Welcome back, ${userName}!` : 'Welcome to Eventify'}
+              {userName ? `Welcome back, ${userName}!` : "Welcome to Eventify"}
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 mb-8">
               Your one-stop solution for managing and discovering amazing events.
             </p>
             <div className="flex justify-center space-x-4">
               <button
-                onClick={() => window.location.href = '/events'}
+                onClick={() => (window.location.href = "/events")}
                 className="px-6 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-md shadow hover:bg-indigo-700 transition duration-300"
               >
                 Discover Events
               </button>
               <button
-                onClick={() => window.location.href = '/create-event'}
+                onClick={() => (window.location.href = "/create-event")}
                 className="px-6 py-3 bg-green-600 text-white text-lg font-semibold rounded-md shadow hover:bg-green-700 transition duration-300"
               >
                 Create Event

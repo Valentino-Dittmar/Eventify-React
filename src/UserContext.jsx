@@ -1,10 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 
-// Create UserContext
 const UserContext = createContext();
 
-// Custom hook to access UserContext
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -13,47 +11,42 @@ export const useUser = () => {
   return context;
 };
 
-// UserProvider Component
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null); // Stores the user object
-  const [loading, setLoading] = useState(true); // Loading state
-  const [authType, setAuthType] = useState("context"); // Default to context-based auth
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch user data dynamically based on auth type
   const fetchUser = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
-      const endpoint =
-        authType === "google"
-          ? "http://localhost:8080/auth/google/me"
-          : "http://localhost:8080/auth/me";
+      const endpoint = "http://localhost:8080/auth/token/me";
+      const token = localStorage.getItem("authToken");
 
       const response = await axios.get(endpoint, {
         withCredentials: true,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      setUser(response.data); // Update user state
+      setUser(response.data);
     } catch (error) {
       console.error("Error fetching user:", error);
-      setUser(null); // Reset user on error
+      setUser(null);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-  // Fetch user on mount and when authType changes
   useEffect(() => {
     fetchUser();
-  }, [authType]);
+  }, []);
 
   return (
     <UserContext.Provider
       value={{
         user,
+        setUser,
         loading,
-        setUser, // Allow manual user updates
-        setAuthType, // Allow switching between auth types
-        authType,
+        setLoading,
+        fetchUser,
       }}
     >
       {loading ? <div>Loading...</div> : children}

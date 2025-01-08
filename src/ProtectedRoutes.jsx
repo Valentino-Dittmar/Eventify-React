@@ -1,23 +1,32 @@
+// src/ProtectedRoutes.js
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useUser } from "./UserContext";
 
-const ProtectedRoute = ({ element, roles }) => {
+const ProtectedRoute = ({ element, roles: allowedRoles }) => {
   const { user, loading } = useUser();
 
+  // Wait for user load
   if (loading) {
-    return <div>Loading...</div>; // Wait for user to be fetched
+    return <div>Loading...</div>;
   }
 
+  // If not logged in, redirect to '/'
   if (!user) {
-    return <Navigate to="/" />; // Redirect to login page if not authenticated
+    return <Navigate to="/" />;
   }
 
-  if (roles && !roles.includes(user.role)) {
-    return <Navigate to="/unauthorized" />; // Redirect if role mismatch
+  // If roles are required, check them
+  if (allowedRoles && allowedRoles.length > 0) {
+    const userRoles = user.roles || [];
+    const hasRole = userRoles.some((role) => allowedRoles.includes(role));
+    if (!hasRole) {
+      return <Navigate to="/unauthorized" />;
+    }
   }
 
-  return element; // Render the protected component
+  // Otherwise, load the protected component
+  return element;
 };
 
 export default ProtectedRoute;

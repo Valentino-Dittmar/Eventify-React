@@ -1,26 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useUser } from "../UserContext";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user } = useUser();
 
-  useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
-    setIsLoggedIn(!!authToken); // Setting to true if the token is there
-  }, []);
+  const noHeaderPaths = ["/login", "/register", "/oauth2/callback", "/"];
 
-  // Define paths where the header should not be displayed
-  const noHeaderPaths = ["/login", "/register", "/oauth2/callback", '/'];
-
-  // If the current path is in noHeaderPaths, don't render the header
-  if (noHeaderPaths.includes(location.pathname)) {
-    return null;
-  }
-
-  // If user is not logged in, don't render the header
-  if (!isLoggedIn) {
+  if (noHeaderPaths.includes(location.pathname) || !user) {
     return null;
   }
 
@@ -34,9 +23,7 @@ const Header = () => {
           Eventify
         </h1>
 
-        {/* Navigation Bar */}
         <nav className="flex items-center space-x-6">
-          {/* Attending Events Button */}
           <button
             onClick={() => navigate("/attending-events")}
             className="px-4 py-2 text-lg font-semibold text-white bg-indigo-500 rounded-lg shadow hover:bg-indigo-400 transition duration-300"
@@ -44,7 +31,6 @@ const Header = () => {
             Attending Events
           </button>
 
-          {/* Events Button */}
           <button
             onClick={() => navigate("/events")}
             className="px-4 py-2 text-lg font-semibold text-white bg-indigo-500 rounded-lg shadow hover:bg-indigo-400 transition duration-300"
@@ -52,7 +38,6 @@ const Header = () => {
             Events
           </button>
 
-          {/* Profile Button */}
           <button
             onClick={() => navigate("/profile")}
             className="flex items-center px-4 py-2 text-lg font-semibold text-white bg-indigo-500 rounded-lg shadow hover:bg-indigo-400 transition duration-300"
@@ -65,7 +50,6 @@ const Header = () => {
               stroke="currentColor"
               strokeWidth="2"
             >
-              {/* User Icon */}
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
