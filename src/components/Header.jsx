@@ -13,6 +13,9 @@ const Header = () => {
     return null;
   }
 
+  // Check if user role is CUSTOMER
+  const isCustomer = user.roles?.includes("CUSTOMER");
+
   return (
     <header className="bg-indigo-600 shadow-md">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
@@ -24,12 +27,15 @@ const Header = () => {
         </h1>
 
         <nav className="flex items-center space-x-6">
-          <button
-            onClick={() => navigate("/attending-events")}
-            className="px-4 py-2 text-lg font-semibold text-white bg-indigo-500 rounded-lg shadow hover:bg-indigo-400 transition duration-300"
-          >
-            Attending Events
-          </button>
+          {/* Conditionally render Attending Events button*/}
+          {isCustomer && (
+            <button
+              onClick={() => navigate("/attending-events")}
+              className="px-4 py-2 text-lg font-semibold text-white bg-indigo-500 rounded-lg shadow hover:bg-indigo-400 transition duration-300"
+            >
+              Attending Events
+            </button>
+          )}
 
           <button
             onClick={() => navigate("/events")}

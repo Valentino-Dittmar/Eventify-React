@@ -48,12 +48,12 @@ const Unauthorized = () => {
             >
               Go to Homepage
             </button>
-            <button
+            {/* <button
               className="px-8 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg text-lg font-semibold shadow-lg transition duration-300"
               onClick={() => window.history.back()}
             >
               Previous Page
-            </button>
+            </button> */}
           </div>
 
           <p className="mt-12 text-gray-400 text-sm">
