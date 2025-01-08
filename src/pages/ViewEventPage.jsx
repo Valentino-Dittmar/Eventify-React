@@ -2,28 +2,32 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { useUser } from "../UserContext";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client/dist/sockjs";
 
 const ViewEventPage = () => {
   const { id } = useParams();
+  const { user } = useUser();
+
   const [event, setEvent] = useState(null);
   const [attendants, setAttendants] = useState([]);
   const [showAttendants, setShowAttendants] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const { user } = useUser();
 
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
-  const socketRef = useRef(null);
 
+  // STOMP client reference
+  const stompClientRef = useRef(null);
+
+ 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         const token = localStorage.getItem("authToken");
         const response = await axios.get(`http://localhost:8080/events/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
         setEvent(response.data);
         setLoading(false);
@@ -35,27 +39,45 @@ const ViewEventPage = () => {
     };
 
     fetchEvent();
+  }, [id]);
 
-    socketRef.current = new WebSocket("ws://localhost:8080/chat");
-    socketRef.current.onmessage = (event) => {
-      const newMessage = JSON.parse(event.data);
-      setMessages((prev) => [...prev, newMessage]);
-    };
+  // STOMP CLIENT Set Up
+  useEffect(() => {
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = new Client({
+      webSocketFactory: () => socket,
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log("STOMP connected");
+
+        // Subscribing to a chat topic
+        stompClient.subscribe(`/topic/events/${id}/chat`, (message) => {
+          const newMsg = JSON.parse(message.body);
+          setMessages((prev) => [...prev, newMsg]);
+        });
+      },
+      onStompError: (frame) => {
+        console.error("STOMP error:", frame);
+      },
+    });
+
+    stompClientRef.current = stompClient;
+    stompClient.activate();
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
+      if (stompClientRef.current) {
+        stompClientRef.current.deactivate();
+        console.log("STOMP disconnected");
       }
     };
   }, [id]);
 
+ 
   const fetchAttendants = async () => {
     try {
       const token = localStorage.getItem("authToken");
       const response = await axios.get(`http://localhost:8080/events/${id}/attendants`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setAttendants(response.data);
       setShowAttendants(true);
@@ -65,13 +87,30 @@ const ViewEventPage = () => {
     }
   };
 
+ //SENDING A MESSAGE
   const sendMessage = () => {
-    if (socketRef.current && message.trim()) {
+    const stompClient = stompClientRef.current;
+    if (!stompClient || !stompClient.connected) {
+      alert("Chat not connected");
+      return;
+    }
+  
+    if (message.trim()) {
+      let userName = user?.name;
+      if (!userName && user?.email) {
+        userName = user.email.split("@")[0]; // Extract a username from the email for google users 
+      }
+  
       const chatMessage = {
-        user: user.name,
+        user: userName || "Guest", 
         content: message,
       };
-      socketRef.current.send(JSON.stringify(chatMessage));
+  
+      stompClient.publish({
+        destination: `/app/events/${id}/chat`,
+        body: JSON.stringify(chatMessage),
+      });
+  
       setMessage("");
     }
   };
@@ -87,7 +126,9 @@ const ViewEventPage = () => {
   if (error || !event) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-2xl font-semibold text-red-500">Error loading event. Please try again later.</p>
+        <p className="text-2xl font-semibold text-red-500">
+          Error loading event. Please try again later.
+        </p>
       </div>
     );
   }
@@ -137,7 +178,9 @@ const ViewEventPage = () => {
           <h2 className="text-3xl font-bold text-gray-800 mb-6">Live Chat</h2>
           <div className="border border-gray-300 rounded-lg p-4 h-64 overflow-y-scroll mb-6 bg-gray-50">
             {messages.length === 0 ? (
-              <p className="text-center text-gray-500">No messages yet. Be the first to say hi!</p>
+              <p className="text-center text-gray-500">
+                No messages yet. Be the first to say hi!
+              </p>
             ) : (
               messages.map((msg, index) => (
                 <div key={index} className="mb-3">

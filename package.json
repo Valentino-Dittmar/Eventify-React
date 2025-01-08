@@ -11,11 +11,14 @@
     "test": "vite test"
   },
   "dependencies": {
-    "axios": "^1.7.7",
+    "@stomp/stompjs": "^7.0.0",
+    "axios": "^1.7.9",
     "formik": "^2.4.6",
+    "global": "^4.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2",
+    "sockjs-client": "^1.5.1",
     "yup": "^1.5.0"
   },
   "devDependencies": {
