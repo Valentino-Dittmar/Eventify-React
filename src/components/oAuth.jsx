@@ -11,14 +11,12 @@ const OAuthCallback = () => {
     const token = params.get('token');
 
     if (token) {
-      // Store the token in localStorage
       localStorage.setItem('authToken', token);
       console.log('Google login successful, token stored:', token);
 
-      // Clean up URL by removing query parameters
+      // Clean up URL by removing query parameters so its more secure ;)
       window.history.replaceState({}, document.title, window.location.pathname);
 
-      // Redirect to the dashboard or home page
       navigate('/home');
     } else {
       console.error('No token found in URL');

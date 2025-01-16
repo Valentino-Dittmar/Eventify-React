@@ -49,12 +49,10 @@ const RegisterForm = () => {
         }
       );
 
-      // Store the token in localStorage
-      const token = response.data; // Assuming token is returned as plain string
+      const token = response.data; 
       localStorage.setItem("authToken", token);
       console.log("Registration successful, token stored:", token);
 
-      // Redirect to the dashboard after successful registration
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during registration:", error.response?.data || error.message);
