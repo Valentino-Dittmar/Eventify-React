@@ -2,32 +2,28 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const HomePage = () => {
-  // We track userName and loading states
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch user information from the backend
     const fetchUser = async () => {
       try {
         const response = await axios.get("http://localhost:8080/auth/me", {
-          withCredentials: true, // Ensure cookies are included
+          withCredentials: true, 
         });
 
-        // Suppose the backend returns { name: 'John Doe', ... } 
-        // or you have to access it like response.data.username
-        // Adjust as needed:
+   
         if (response.data && response.data.name) {
           setUserName(response.data.name);
         } else {
-          setUserName(""); // or handle no name case
+          setUserName(""); 
         }
       } catch (error) {
         console.error("Error fetching user:", error);
-        // On error, just reset userName or do nothing
+       
         setUserName("");
       } finally {
-        setLoading(false); // We're done loading regardless
+        setLoading(false); 
       }
     };
 
@@ -35,7 +31,6 @@ const HomePage = () => {
   }, []);
 
   if (loading) {
-    // Show a simple loader while fetching
     return <div>Loading...</div>;
   }
 

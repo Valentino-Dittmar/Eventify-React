@@ -10,7 +10,7 @@ import CreateEventPage from "./pages/Event_Manager/CreateEvent";
 import ViewEventPage from "./pages/ViewEventPage";
 import AttendingEventsPage from "./pages/Customer/AttendingEvents";
 
-// Lazy-loaded pages
+// Lazy-loading with suspence because of Loading...
 const LoginPage = lazy(() => import("./pages/Login"));
 const RegisterPage = lazy(() => import("./pages/Register"));
 const HomePage = lazy(() => import("./pages/Home"));
@@ -22,7 +22,6 @@ const UnauthorizedPage = lazy(() => import("./pages/Unauthorized"));
 function App() {
   return (
     <UserProvider>
-      {/* The ONLY BrowserRouter in your entire app! */}
       <Router>
         <Header />
 

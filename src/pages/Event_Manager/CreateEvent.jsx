@@ -7,7 +7,7 @@ import { useUser } from "../../UserContext";
 
 const CreateEventPage = () => {
   const navigate = useNavigate();
-  const { user } = useUser(); // Get the user context
+  const { user } = useUser(); 
 
   const initialValues = {
     title: "",
@@ -38,7 +38,7 @@ const CreateEventPage = () => {
         "http://localhost:8080/events",
         {
           ...values,
-          creatorId: user.userId, // Pass the creatorId from the user context
+          creatorId: user.userId, 
         },
         {
           headers: {

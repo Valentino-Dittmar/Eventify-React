@@ -6,7 +6,6 @@ import { useUser } from "./UserContext";
 const ProtectedRoute = ({ element, roles: allowedRoles }) => {
   const { user, loading } = useUser();
 
-  // Wait for user load
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -16,7 +15,6 @@ const ProtectedRoute = ({ element, roles: allowedRoles }) => {
     return <Navigate to="/" />;
   }
 
-  // If roles are required, check them
   if (allowedRoles && allowedRoles.length > 0) {
     const userRoles = user.roles || [];
     const hasRole = userRoles.some((role) => allowedRoles.includes(role));
