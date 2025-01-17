@@ -11,11 +11,59 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout the repository code
-    - name: Checkout code
+    # Checkout the front-end repository code
+    - name: Checkout front-end code
       uses: actions/checkout@v2
 
-    # Set up Docker in the runner
+    # Checkout the back-end repository
+    - name: Checkout back-end code
+      uses: actions/checkout@v2
+      with:
+        repository: Valentino-Dittmar/Eventify # Replace with your back-end repo URL
+        path: backend
+
+    # Set up Java for the back-end
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    # Install Gradle dependencies for the back-end
+    - name: Install back-end dependencies
+      working-directory: ./backend
+      run: ./gradlew build --no-daemon
+
+    # Start the back-end server in the background
+    - name: Start back-end
+      working-directory: ./backend
+      run: ./gradlew bootRun &
+      env:
+        SPRING_PROFILES_ACTIVE: test
+
+    # Wait for the back-end server to be ready
+    - name: Wait for back-end to start
+      run: npx wait-on http://localhost:8080
+
+    # Install Node.js 
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    # Install front-end dependencies
+    - name: Install front-end dependencies
+      run: npm install
+
+    # Run tests for the front-end
+    - name: Run front-end tests
+      run: npm run test -- --watchAll=false
+
+    # Build the front-end application
+    - name: Build front-end
+      run: npm run build
+
+    # Set up Docker
     - name: Set up Docker
       uses: docker/setup-buildx-action@v1
 
