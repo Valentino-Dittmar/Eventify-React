@@ -4,7 +4,7 @@ name: CD React App
 on:
   push:
     branches:
-      - main
+      - Chat&More-Pages
 
 jobs:
   build-and-deploy:
